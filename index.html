@@ -697,10 +697,10 @@ async function analyze() {
   /* Show result section */
   const rs = document.getElementById('resultSection');
   rs.style.display = 'block'; rs.className = 'visible';
+  document.getElementById('kesimpulanLoading').style.display = 'none';
   document.getElementById('kesimpulan').style.display = 'none';
-  document.getElementById('kesimpulanLoading').style.display = 'flex';
   document.getElementById('rekoList').style.display = 'none';
-  document.getElementById('rekoLoading').style.display = 'flex';
+  document.getElementById('rekoLoading').style.display = 'none';
   document.getElementById('produkCard').style.display = 'none';
 
   setTimeout(() => rs.scrollIntoView({ behavior:'smooth', block:'start' }), 100);
@@ -716,96 +716,124 @@ async function analyze() {
   `;
   document.getElementById('produkCard').style.display = 'block';
 
-  /* AI call */
-  const prompt = `Kamu adalah AI Health Assistant yang hangat dan ramah. Buat analisis tumbuh kembang berdasarkan data berikut (GUNAKAN standar WHO sesuai Permenkes RI No. 2 Tahun 2020):
+  /* ── Kesimpulan & Rekomendasi berbasis Z-score ── */
+  const kesimpulanText = buatKesimpulan(nama, usiaLabel, zBBU, zTBU, zIMT, zBBTB, stBBU, stTBU, stIMT, stBBTB);
+  const rekoList       = buatRekomendasi(zBBU, zTBU, zIMT, zBBTB);
 
-Nama: ${nama} | Usia: ${usiaLabel} | Jenis kelamin: ${jk}
-Berat badan: ${bb} kg (median WHO: ${bbM.toFixed(1)} kg)
-Tinggi badan: ${tb} cm (median WHO: ${tbM.toFixed(1)} cm)
-IMT: ${imt.toFixed(1)} (median WHO: ${imtM.toFixed(1)})
+  document.getElementById('kesimpulanLoading').style.display = 'none';
+  const kEl = document.getElementById('kesimpulan');
+  kEl.style.display = 'block';
+  kEl.textContent = kesimpulanText;
 
-Status BB/U: ${stBBU.label} (Z: ${zBBU.toFixed(2)})
-Status TB/U: ${stTBU.label} (Z: ${zTBU.toFixed(2)})
-Status IMT/U: ${stIMT.label} (Z: ${zIMT.toFixed(2)})
-Status BB/TB: ${stBBTB.label} (Z: ${zBBTB.toFixed(2)})
+  document.getElementById('rekoLoading').style.display = 'none';
+  const rEl = document.getElementById('rekoList');
+  rEl.style.display = 'flex';
+  const isUrgent = t => /rujuk|konsultasi|segera|dokter|ahli gizi|HDI/i.test(t);
+  rEl.innerHTML = rekoList.map(p => {
+    const urg = isUrgent(p);
+    return `<li class="reko-item ${urg?'warn':'ok'}"><div class="ricon">${urg?'⚠️':'✅'}</div><span>${p}</span></li>`;
+  }).join('');
 
-Tulis dalam format persis ini:
-KESIMPULAN:
-[2-3 kalimat singkat, bahasa orang tua, hangat, tidak menakutkan. Sebutkan nama anak.]
-
-REKOMENDASI:
-- [Saran pola makan / nutrisi spesifik sesuai kondisi]
-- [Saran stimulasi tumbuh kembang]
-- [Saran aktivitas atau tidur]
-- [Saran pemantauan lanjut / jadwal kontrol]
-- [Jika ada indikator kurang/lebih: saran konsultasi dan dukungan suplementasi HDI Kids]`;
-
-  try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:800, messages:[{role:'user',content:prompt}] })
-    });
-    const data2 = await resp.json();
-    const text  = data2.content?.map(i=>i.text||'').join('')||'';
-
-    const kMatch = text.match(/KESIMPULAN:\s*([\s\S]*?)(?=REKOMENDASI:|$)/i);
-    const rMatch = text.match(/REKOMENDASI:\s*([\s\S]*)$/i);
-
-    const kesimpulanText = kMatch ? kMatch[1].trim() : 'Pemantauan tumbuh kembang sudah dilakukan. Lihat status Z-score di atas untuk detail.';
-
-    document.getElementById('kesimpulanLoading').style.display = 'none';
-    const kEl = document.getElementById('kesimpulan');
-    kEl.style.display = 'block';
-    kEl.textContent = kesimpulanText;
-
-    document.getElementById('rekoLoading').style.display = 'none';
-    const rEl = document.getElementById('rekoList');
-    rEl.style.display = 'flex';
-    if (rMatch) {
-      const poin = rMatch[1].trim().split('\n').map(l=>l.replace(/^[-•*\d.]\s*/,'')).filter(l=>l.trim());
-      const isUrgent = t => /rujuk|konsultasi|segera|dokter|darurat|gizi buruk|severe|HDI|suplemen/i.test(t);
-      rEl.innerHTML = poin.map(p => {
-        const urg = isUrgent(p);
-        return `<li class="reko-item ${urg?'warn':'ok'}"><div class="ricon">${urg?'⚠️':'✅'}</div><span>${p}</span></li>`;
-      }).join('');
-    } else {
-      rEl.innerHTML = '<li class="reko-item ok"><div class="ricon">✅</div><span>Pantau pertumbuhan si kecil setiap bulan di posyandu atau fasilitas kesehatan terdekat.</span></li>';
-    }
-
-    // Kirim data ke Google Sheets
-    await kirimKeSheet({
-      nama, jk, usia, usiaLabel,
-      bb, tb, imt: parseFloat(imt.toFixed(2)),
-      bbMedian: parseFloat(bbM.toFixed(2)),
-      tbMedian: parseFloat(tbM.toFixed(2)),
-      imtMedian: parseFloat(imtM.toFixed(2)),
-      zBBU:  parseFloat(zBBU.toFixed(2)),
-      zTBU:  parseFloat(zTBU.toFixed(2)),
-      zIMT:  parseFloat(zIMT.toFixed(2)),
-      zBBTB: parseFloat(zBBTB.toFixed(2)),
-      statusBBU:  stBBU.label,
-      statusTBU:  stTBU.label,
-      statusIMT:  stIMT.label,
-      statusBBTB: stBBTB.label,
-      perluRujukan,
-      kondisiHDI: produkInfo.kondisi,
-      kesimpulan: kesimpulanText
-    });
-
-  } catch(e) {
-    document.getElementById('kesimpulanLoading').style.display = 'none';
-    const kEl = document.getElementById('kesimpulan');
-    kEl.style.display = 'block';
-    kEl.textContent = 'Tidak dapat memuat analisis AI saat ini. Silakan lihat interpretasi Z-score di atas.';
-    document.getElementById('rekoLoading').style.display = 'none';
-    const rEl = document.getElementById('rekoList');
-    rEl.style.display = 'flex';
-    rEl.innerHTML = '<li class="reko-item ok"><div class="ricon">✅</div><span>Pantau pertumbuhan si kecil setiap bulan di posyandu atau fasilitas kesehatan.</span></li>';
-  }
+  /* Kirim ke Google Sheets */
+  await kirimKeSheet({
+    nama, jk, usia, usiaLabel,
+    bb, tb, imt: parseFloat(imt.toFixed(2)),
+    bbMedian: parseFloat(bbM.toFixed(2)),
+    tbMedian: parseFloat(tbM.toFixed(2)),
+    imtMedian: parseFloat(imtM.toFixed(2)),
+    zBBU:  parseFloat(zBBU.toFixed(2)),
+    zTBU:  parseFloat(zTBU.toFixed(2)),
+    zIMT:  parseFloat(zIMT.toFixed(2)),
+    zBBTB: parseFloat(zBBTB.toFixed(2)),
+    statusBBU:  stBBU.label,
+    statusTBU:  stTBU.label,
+    statusIMT:  stIMT.label,
+    statusBBTB: stBBTB.label,
+    perluRujukan,
+    kondisiHDI: produkInfo.kondisi,
+    kesimpulan: kesimpulanText
+  });
 
   btn.disabled = false;
   btn.innerHTML = '🔄 Analisis Ulang';
+}
+
+/* ── Fungsi kesimpulan berbasis Z-score ── */
+function buatKesimpulan(nama, usiaLabel, zBBU, zTBU, zIMT, zBBTB, stBBU, stTBU, stIMT, stBBTB) {
+  const masalah = [];
+  if (zTBU < -3)       masalah.push('tinggi badan sangat kurang dari standar (sangat pendek)');
+  else if (zTBU < -2)  masalah.push('tinggi badan kurang dari standar usianya (stunting)');
+  if (zBBU < -3)       masalah.push('berat badan sangat kurang');
+  else if (zBBU < -2)  masalah.push('berat badan kurang dari standar usianya');
+  if (zIMT < -3)       masalah.push('status gizi sangat kurang (gizi buruk)');
+  else if (zIMT < -2)  masalah.push('status gizi kurang');
+  if (zIMT > 2 || zBBTB > 2) masalah.push('berat badan melebihi standar untuk tingginya');
+
+  if (masalah.length === 0) {
+    return `Kabar baik! Pertumbuhan ${nama} saat ini berada dalam kondisi normal sesuai standar WHO untuk usia ${usiaLabel}. Berat badan, tinggi badan, dan indeks massa tubuh semuanya terpantau baik. Pertahankan pola makan bergizi dan terus stimulasi tumbuh kembang si kecil ya, Bun! 🌟`;
+  }
+
+  if (masalah.length === 1) {
+    return `Berdasarkan hasil pemantauan, ${nama} menunjukkan ${masalah[0]} dibandingkan standar WHO untuk usia ${usiaLabel}. Kondisi ini perlu mendapat perhatian lebih agar tumbuh kembang si kecil bisa optimal. Jangan khawatir, dengan pola makan yang tepat dan pendampingan yang baik, kondisi ini dapat diperbaiki.`;
+  }
+
+  return `Hasil pemantauan ${nama} pada usia ${usiaLabel} menunjukkan beberapa kondisi yang perlu diperhatikan, yaitu ${masalah.join(' serta ')}. Diperlukan evaluasi dan perhatian lebih terhadap asupan nutrisi serta pola makan sehari-hari. Segera konsultasikan ke tenaga kesehatan untuk penanganan yang tepat.`;
+}
+
+/* ── Fungsi rekomendasi berbasis Z-score ── */
+function buatRekomendasi(zBBU, zTBU, zIMT, zBBTB) {
+  /* OBESITAS / GIZI LEBIH */
+  if (zIMT > 2 || zBBTB > 2) {
+    return [
+      'Kurangi makanan tinggi gula, gorengan, dan minuman manis seperti susu kental manis atau minuman kemasan.',
+      'Perbanyak sayur, buah, dan makanan berserat tinggi sebagai camilan sehat pengganti jajanan.',
+      'Tingkatkan aktivitas fisik minimal 60 menit per hari — bermain di luar, bersepeda, atau berenang.',
+      'Batasi screen time (TV, gadget) maksimal 1–2 jam per hari agar anak lebih aktif bergerak.',
+      'Konsultasikan ke dokter atau ahli gizi untuk program penurunan berat badan yang aman sesuai usia anak.',
+    ];
+  }
+
+  /* GIZI BURUK / SEVERE WASTING */
+  if (zIMT < -3 || zBBTB < -3 || zBBU < -3) {
+    return [
+      'Segera konsultasikan ke dokter atau ahli gizi — kondisi ini memerlukan penanganan medis segera.',
+      'Berikan makanan tinggi energi dan protein setiap 2–3 jam: telur, daging, ikan, tahu, tempe, dan kacang-kacangan.',
+      'Tambahkan sumber lemak sehat seperti alpukat, minyak kelapa, atau mentega pada makanan utama.',
+      'Pantau berat badan setiap minggu dan catat perkembangannya untuk dilaporkan ke tenaga kesehatan.',
+      'Pertimbangkan suplementasi nutrisi pendukung seperti HDI Kids™ HoneyBee PollenS untuk melengkapi asupan harian.',
+    ];
+  }
+
+  /* STUNTING */
+  if (zTBU < -2) {
+    return [
+      'Tingkatkan asupan protein hewani setiap hari: telur, ikan, ayam, daging, atau susu — minimal 1 porsi tiap makan.',
+      'Pastikan kecukupan kalsium dan zinc dari susu, keju, tempe, atau kacang hijau untuk mendukung pertumbuhan tulang.',
+      'Berikan makanan beragam dengan porsi sesuai usia — hindari makanan ultra-proses atau instan sebagai makanan utama.',
+      'Stimulasi aktif setiap hari: bermain, membaca, bernyanyi, dan eksplorasi lingkungan untuk perkembangan optimal.',
+      'Konsultasikan ke dokter atau ahli gizi dan pantau tinggi badan setiap bulan. Pertimbangkan HDI KIDS Q Bees untuk mendukung pertumbuhan tulang.',
+    ];
+  }
+
+  /* GIZI KURANG / BB RENDAH */
+  if (zBBU < -2 || zIMT < -2) {
+    return [
+      'Tambah frekuensi makan menjadi 3 kali makan utama dan 2–3 kali camilan bergizi setiap hari.',
+      'Perbanyak protein hewani: telur, ikan, ayam, atau daging minimal sekali sehari untuk mendukung pertumbuhan.',
+      'Fortifikasi makanan dengan tambahan minyak, mentega, atau santan untuk meningkatkan kandungan kalori.',
+      'Pantau berat badan setiap 2 minggu dan lakukan pemeriksaan ke Posyandu atau Puskesmas rutin.',
+      'Konsultasikan ke ahli gizi jika berat badan tidak naik dalam 1 bulan. Pertimbangkan HDI Kids™ HoneyBee PollenS sebagai suplemen pendukung nutrisi.',
+    ];
+  }
+
+  /* NORMAL */
+  return [
+    'Pertahankan pola makan gizi seimbang dengan variasi makanan dari semua kelompok: karbohidrat, protein, lemak, sayur, dan buah.',
+    'Berikan protein hewani (telur, ikan, ayam) minimal sekali sehari untuk mendukung pertumbuhan optimal.',
+    'Dukung aktivitas fisik setiap hari minimal 60 menit dan pastikan tidur cukup sesuai usia anak.',
+    'Lakukan stimulasi tumbuh kembang sesuai usia — bermain, membaca, dan bersosialisasi dengan teman sebaya.',
+    'Pantau pertumbuhan rutin setiap bulan di Posyandu. Pertimbangkan HDI KIDS Gummy Bees sebagai suplemen vitamin C harian.',
+  ];
 }
 </script>
 </body>
