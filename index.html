@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skrining Tumbuh Kembang Anak – HDI Kids</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red-heart:      #FF353F;
+  --sunrise-yellow: #FBAD18;
+  --midnight:       #444345;
+  --beeswax:        #F0DFCF;
+  --buzz-green:     #5D7261;
+  --peachy-wink:    #E89B8A;
+  --soft-bee:       #FFCF8D;
+  --creamy-pollen:  #F2E8E2;
+  --minty-hug:      #C6D7B9;
+  --page-bg:        #FEF8F0;
+  --card-bg:        #FFFFFF;
+  --text-dark:      #2D2A2B;
+  --text-mid:       #5A5758;
+  --text-light:     #9A9698;
+  --radius-lg:      20px;
+  --radius-md:      14px;
+  --radius-sm:      10px;
+  --shadow:         0 4px 20px rgba(68,67,69,.10);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito Sans',sans-serif;background:var(--page-bg);color:var(--text-dark);min-height:100vh;padding-bottom:3rem}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,var(--red-heart) 0%,#FF6B70 55%,var(--sunrise-yellow) 100%);padding:2.5rem 1.5rem 4.5rem;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.08)}
+.hero::after{content:'';position:absolute;bottom:-60px;left:-30px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.06)}
+.hero-badge{display:inline-block;background:rgba(255,255,255,.22);border:1.5px solid rgba(255,255,255,.4);border-radius:100px;padding:4px 14px;font-size:12px;font-weight:700;color:#fff;margin-bottom:12px;letter-spacing:.04em}
+.hero-icon{width:72px;height:72px;background:rgba(255,255,255,.22);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:14px}
+.hero h1{font-family:'Nunito',sans-serif;font-size:26px;font-weight:900;color:#fff;line-height:1.2;margin-bottom:8px}
+.hero p{font-size:14px;color:rgba(255,255,255,.88);max-width:340px;margin:0 auto;line-height:1.5}
+.wave{margin-top:-2px;line-height:0}
+.wave svg{display:block;width:100%}
+
+/* LAYOUT */
+.main{max-width:580px;margin:-48px auto 0;padding:0 16px;position:relative;z-index:10}
+
+/* CARD */
+.card{background:var(--card-bg);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px}
+.card-header{display:flex;align-items:center;gap:10px;padding:15px 20px 13px;border-bottom:1.5px dashed #EDE8E3}
+.card-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.card-icon.yellow{background:#FFF3D0}
+.card-icon.green{background:#E8F1E4}
+.card-icon.peachy{background:#FDE9E4}
+.card-icon.blue{background:#E3F0FB}
+.card-header-text h3{font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;color:var(--text-dark)}
+.card-header-text p{font-size:12px;color:var(--text-light)}
+.card-body{padding:16px 20px}
+
+/* FORM */
+.field{margin-bottom:13px}
+.field:last-child{margin-bottom:0}
+label{display:block;font-size:13px;font-weight:700;color:var(--text-mid);margin-bottom:6px}
+.input-wrap{position:relative}
+.input-wrap .input-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:18px;line-height:1}
+input[type=text],input[type=number],select{width:100%;height:46px;border:2px solid #EDE8E3;border-radius:var(--radius-sm);padding:0 14px 0 40px;font-family:'Nunito Sans',sans-serif;font-size:15px;font-weight:600;color:var(--text-dark);background:#FDFAF7;outline:none;transition:border-color .2s,box-shadow .2s;appearance:none;-webkit-appearance:none}
+input:focus,select:focus{border-color:var(--sunrise-yellow);box-shadow:0 0 0 3px rgba(251,173,24,.18);background:#fff}
+select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath fill='%239A9698' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+.hint{font-size:11px;color:var(--text-light);margin-top:4px;font-weight:600}
+.row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+
+/* BUTTON */
+.btn-analyze{width:100%;height:52px;border:none;border-radius:var(--radius-md);background:var(--red-heart);color:#fff;font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s,box-shadow .15s,opacity .15s;box-shadow:0 4px 16px rgba(255,53,63,.35);letter-spacing:.01em}
+.btn-analyze:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,53,63,.4)}
+.btn-analyze:active{transform:scale(.98)}
+.btn-analyze:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* RESULT */
+#resultSection{display:none}
+#resultSection.visible{display:block}
+
+/* METRIC TILES */
+.metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.metric-tile{background:var(--creamy-pollen);border-radius:var(--radius-sm);padding:12px 14px;border:1.5px solid rgba(0,0,0,.05)}
+.metric-tile .mlabel{font-size:11px;font-weight:700;color:var(--text-light);margin-bottom:2px}
+.metric-tile .mval{font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;color:var(--text-dark)}
+.metric-tile .msub{font-size:11px;color:var(--text-mid);margin-top:2px}
+
+/* STATUS */
+.status-list{display:flex;flex-direction:column;gap:8px}
+.status-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#FDFAF7;border-radius:var(--radius-sm);border:1.5px solid #EDE8E3;gap:8px}
+.status-item .sname{font-size:12px;font-weight:700;color:var(--text-mid)}
+.status-item .sscore{font-size:11px;color:var(--text-light);margin-top:1px}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:100px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;white-space:nowrap;flex-shrink:0}
+.badge.normal{background:#E8F1E4;color:#3B6044}
+.badge.warning{background:#FFF3D0;color:#8C6200}
+.badge.danger{background:#FFE5E6;color:#C41020}
+.badge.info{background:#E0EEF9;color:#1A5F9C}
+
+/* KESIMPULAN */
+.kesimpulan-box{background:linear-gradient(135deg,#FFF8EC,#FDEEDE);border:2px solid var(--soft-bee);border-radius:var(--radius-md);padding:16px;position:relative;overflow:hidden}
+.kesimpulan-box::before{content:'💬';position:absolute;top:12px;right:14px;font-size:28px;opacity:.18}
+.kesimpulan-box p{font-size:13px;line-height:1.65;color:var(--text-dark);position:relative;z-index:1}
+
+/* REKOMENDASI */
+.reko-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+.reko-item{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:var(--radius-sm);background:#FDFAF7;border:1.5px solid #EDE8E3;font-size:13px;line-height:1.5;color:var(--text-dark)}
+.reko-item .ricon{width:26px;height:26px;min-width:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.reko-item.ok   .ricon{background:#E8F1E4}
+.reko-item.warn .ricon{background:#FFF3D0}
+
+/* PRODUK HDI */
+.produk-section{margin-top:6px}
+.produk-section-title{font-size:12px;font-weight:800;color:var(--text-mid);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.produk-grid{display:flex;flex-direction:column;gap:10px}
+.produk-card{background:#fff;border:1.5px solid #EDE8E3;border-radius:var(--radius-md);padding:14px 16px;display:flex;gap:14px;align-items:flex-start}
+.produk-card.highlight{border-color:var(--sunrise-yellow);background:linear-gradient(135deg,#FFFDF5,#FFF8E1)}
+.produk-emoji{font-size:32px;flex-shrink:0;margin-top:2px}
+.produk-info{}
+.produk-name{font-family:'Nunito',sans-serif;font-size:14px;font-weight:900;color:var(--text-dark);margin-bottom:3px}
+.produk-tag{display:inline-block;background:var(--soft-bee);color:#6B4800;font-size:10px;font-weight:800;padding:2px 8px;border-radius:100px;margin-bottom:6px}
+.produk-desc{font-size:12px;color:var(--text-mid);line-height:1.55}
+.produk-manfaat{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px}
+.manfaat-chip{font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;background:#E8F1E4;color:#3B6044}
+.manfaat-chip.yellow{background:#FFF3D0;color:#8C6200}
+
+/* RUJUKAN ALERT */
+.rujukan-alert{background:#FFE5E6;border:2px solid var(--red-heart);border-radius:var(--radius-md);padding:14px 16px;display:none;gap:10px;margin-bottom:14px}
+.rujukan-alert.visible{display:flex}
+.rujukan-alert .ra-icon{font-size:24px;flex-shrink:0;margin-top:1px}
+.rujukan-alert .ra-text{font-size:13px;line-height:1.5;color:#8B0010}
+.rujukan-alert .ra-text strong{font-family:'Nunito',sans-serif;font-weight:800;display:block;margin-bottom:2px}
+
+/* DISCLAIMER */
+.disclaimer{background:var(--minty-hug);border-radius:var(--radius-md);padding:14px 16px;display:flex;gap:10px;align-items:flex-start;margin-top:14px}
+.disclaimer p{font-size:12px;line-height:1.55;color:#2A4430;font-weight:600}
+
+/* CTA SECTION */
+.cta-section{margin-top:14px;padding:20px 0 4px}
+.cta-label{font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:var(--text-mid);text-align:center;margin-bottom:12px;letter-spacing:.01em}
+.cta-grid{display:flex;flex-direction:column;gap:10px}
+.cta-btn{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:var(--radius-md);border:2px solid transparent;cursor:pointer;text-decoration:none;transition:transform .15s,box-shadow .15s;width:100%;text-align:left;background:#fff}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.10)}
+.cta-btn:active{transform:scale(.98)}
+.cta-btn-icon{flex-shrink:0;width:44px;height:44px;display:flex;align-items:center;justify-content:center}
+.cta-btn-text{flex:1;display:flex;flex-direction:column;gap:2px}
+.cta-btn-title{font-family:'Nunito',sans-serif;font-size:14px;font-weight:900;color:var(--text-dark)}
+.cta-btn-sub{font-size:12px;color:var(--text-light);font-weight:600}
+.cta-btn-arrow{font-size:18px;color:var(--text-light);flex-shrink:0}
+.cta-wa{border-color:#D4F5DC;background:linear-gradient(135deg,#F0FFF4,#E6FAE9)}
+.cta-wa .cta-btn-title{color:#1A6B30}
+.cta-wa .cta-btn-arrow{color:#25D366}
+.cta-download{border-color:#FFF0C0;background:linear-gradient(135deg,#FFFDF0,#FFF8D6)}
+.cta-download .cta-btn-title{color:#7A5800}
+.cta-download .cta-btn-arrow{color:#FBAD18}
+.cta-shop{border-color:#DDE9D8;background:linear-gradient(135deg,#F4F8F2,#EAF1E6)}
+.cta-shop .cta-btn-title{color:#2D4A32}
+.cta-shop .cta-btn-arrow{color:#5D7261}
+
+/* FOOTER */
+.footer{text-align:center;padding:2rem 1rem 1rem;font-size:12px;color:var(--text-light);font-weight:600}
+.footer span{color:var(--red-heart)}
+
+/* LOADING */
+.spinner{width:20px;height:20px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ai-loading{display:flex;align-items:center;gap:8px;padding:4px 0}
+.ai-loading span{font-size:13px;color:var(--text-mid);font-weight:600}
+.dots span{display:inline-block;animation:blink 1.2s infinite}
+.dots span:nth-child(2){animation-delay:.2s}
+.dots span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
+
+@media(max-width:420px){
+  .row-3{grid-template-columns:1fr 1fr}
+  .row-3 .field:nth-child(3){grid-column:1/-1}
+  .metrics-grid{grid-template-columns:1fr}
+  .hero h1{font-size:22px}
+  .produk-card{flex-direction:column;gap:8px}
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">🐝 HDI Kids Health Check</div>
+  <div class="hero-icon">👶</div>
+  <h1>Skrining Tumbuh Kembang Anak</h1>
+  <p>Pantau tumbuh kembang si kecil berdasarkan standar WHO — cepat, mudah, dan akurat.</p>
+</div>
+<div class="wave">
+  <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <path d="M0,30 C360,60 1080,0 1440,30 L1440,60 L0,60 Z" fill="#FEF8F0"/>
+  </svg>
+</div>
+
+<div class="main">
+
+  <!-- DATA ANAK -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon yellow">🧒</div>
+      <div class="card-header-text">
+        <h3>Data anak</h3>
+        <p>Isi informasi dasar si kecil</p>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="row-2">
+        <div class="field">
+          <label for="nama">Nama anak</label>
+          <div class="input-wrap">
+            <span class="input-icon">✏️</span>
+            <input type="text" id="nama" placeholder="Contoh: Budi" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="jk">Jenis kelamin</label>
+          <div class="input-wrap">
+            <span class="input-icon">👤</span>
+            <select id="jk">
+              <option value="">Pilih...</option>
+              <option value="Laki-laki">👦 Laki-laki</option>
+              <option value="Perempuan">👧 Perempuan</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PENGUKURAN -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon green">📏</div>
+      <div class="card-header-text">
+        <h3>Data pengukuran</h3>
+        <p>Masukkan hasil pengukuran hari ini</p>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="row-3">
+        <div class="field">
+          <label for="usia">Usia</label>
+          <div class="input-wrap">
+            <span class="input-icon">🎂</span>
+            <input type="number" id="usia" placeholder="24" min="0" max="120" />
+          </div>
+          <div class="hint">dalam bulan</div>
+        </div>
+        <div class="field">
+          <label for="bb">Berat badan</label>
+          <div class="input-wrap">
+            <span class="input-icon">⚖️</span>
+            <input type="number" id="bb" placeholder="12.5" step="0.1" min="1" max="60" />
+          </div>
+          <div class="hint">kilogram (kg)</div>
+        </div>
+        <div class="field">
+          <label for="tb">Tinggi badan</label>
+          <div class="input-wrap">
+            <span class="input-icon">📐</span>
+            <input type="number" id="tb" placeholder="87" step="0.1" min="30" max="200" />
+          </div>
+          <div class="hint">sentimeter (cm)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-analyze" id="btnAnalyze" onclick="analyze()">
+    🔍 Analisis Pertumbuhan
+  </button>
+
+  <!-- HASIL -->
+  <div id="resultSection">
+
+    <!-- PENGUKURAN -->
+    <div class="card" style="margin-top:14px">
+      <div class="card-header">
+        <div class="card-icon yellow">📊</div>
+        <div class="card-header-text">
+          <h3>Hasil pengukuran</h3>
+          <p>Dibandingkan dengan median WHO</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="metrics-grid" id="metricGrid"></div>
+      </div>
+    </div>
+
+    <!-- INTERPRETASI -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon peachy">🎯</div>
+        <div class="card-header-text">
+          <h3>Interpretasi pertumbuhan</h3>
+          <p>Status Z-score standar WHO</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="status-list" id="statusRows"></div>
+      </div>
+    </div>
+
+    <!-- RUJUKAN -->
+    <div class="rujukan-alert" id="rujukanAlert">
+      <div class="ra-icon">⚠️</div>
+      <div class="ra-text">
+        <strong>Perlu perhatian tenaga kesehatan</strong>
+        <span id="rujukanText"></span>
+      </div>
+    </div>
+
+    <!-- KESIMPULAN AI -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon yellow">💡</div>
+        <div class="card-header-text">
+          <h3>Kesimpulan</h3>
+          <p>Analisis AI untuk orang tua</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="kesimpulan-box">
+          <div id="kesimpulanLoading" class="ai-loading">
+            <span>AI sedang menganalisis</span>
+            <span class="dots"><span>•</span><span>•</span><span>•</span></span>
+          </div>
+          <p id="kesimpulan" style="display:none"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- REKOMENDASI UMUM -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon green">🌱</div>
+        <div class="card-header-text">
+          <h3>Rekomendasi</h3>
+          <p>Langkah nyata untuk orang tua</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div id="rekoLoading" class="ai-loading">
+          <span>Menyiapkan rekomendasi</span>
+          <span class="dots"><span>•</span><span>•</span><span>•</span></span>
+        </div>
+        <ul class="reko-list" id="rekoList" style="display:none"></ul>
+      </div>
+    </div>
+
+    <!-- REKOMENDASI PRODUK HDI -->
+    <div class="card" id="produkCard" style="display:none">
+      <div class="card-header">
+        <div class="card-icon yellow">🐝</div>
+        <div class="card-header-text">
+          <h3>Dukungan Nutrisi HDI</h3>
+          <p>Produk terpilih sesuai kondisi anak</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div id="produkGrid" class="produk-grid"></div>
+      </div>
+    </div>
+
+    <div class="disclaimer">
+      <div style="font-size:20px;flex-shrink:0">🩺</div>
+      <p>Hasil ini merupakan <strong>skrining awal</strong> berdasarkan data yang dimasukkan dan tidak menggantikan pemeriksaan langsung oleh dokter atau tenaga kesehatan. Selalu konsultasikan hasil ini kepada tenaga medis profesional.</p>
+    </div>
+
+    <!-- CTA BUTTONS -->
+    <div class="cta-section" id="ctaSection">
+      <p class="cta-label">Langkah selanjutnya untuk si kecil 🐝</p>
+      <div class="cta-grid">
+
+        <!-- WA -->
+        <a class="cta-btn cta-wa" href="https://wa.me/6282131597840" target="_blank" rel="noopener">
+          <div class="cta-btn-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.978-1.42A9.953 9.953 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2Z" fill="#25D366"/>
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347Z" fill="#fff"/>
+            </svg>
+          </div>
+          <div class="cta-btn-text">
+            <span class="cta-btn-title">Konsultasi via WhatsApp</span>
+            <span class="cta-btn-sub">Chat langsung dengan kami</span>
+          </div>
+          <div class="cta-btn-arrow">→</div>
+        </a>
+
+        <!-- UNDUH JPG -->
+        <button class="cta-btn cta-download" onclick="unduhHasil()">
+          <div class="cta-btn-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="24" height="24" rx="12" fill="#FBAD18"/>
+              <path d="M12 5v9m0 0-3-3m3 3 3-3M6 17h12" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="cta-btn-text">
+            <span class="cta-btn-title">Unduh Hasil (.JPG)</span>
+            <span class="cta-btn-sub">Simpan & bagikan ke keluarga</span>
+          </div>
+          <div class="cta-btn-arrow">→</div>
+        </button>
+
+        <!-- HDI WEBSITE -->
+        <a class="cta-btn cta-shop" href="https://www.hdi.com" target="_blank" rel="noopener">
+          <div class="cta-btn-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="24" height="24" rx="12" fill="#5D7261"/>
+              <path d="M7 7h10l-1.5 7h-7L7 7Z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>
+              <circle cx="9.5" cy="17" r="1" fill="#fff"/>
+              <circle cx="15.5" cy="17" r="1" fill="#fff"/>
+              <path d="M5 5h1.5l.5 2" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="cta-btn-text">
+            <span class="cta-btn-title">Belanja Produk HDI</span>
+            <span class="cta-btn-sub">Kunjungi toko resmi HDI</span>
+          </div>
+          <div class="cta-btn-arrow">→</div>
+        </a>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer">
+  Didukung oleh <span>HDI Indonesia</span> · Standar WHO Child Growth Standards (Permenkes No. 2/2020)
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+// ── KONFIGURASI: paste URL Web App Google Apps Script di sini ──
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx-A-wXceJ9fGPJ1DlKa3VQt8MpZXUcjpJeKDN9J7dunHdsR39cT2p-rpNQkoNAQUek/exec';
+// ───────────────────────────────────────────────────────────────
+
+async function unduhHasil() {
+  const hasil = document.getElementById('resultSection');
+  if (!hasil || hasil.style.display === 'none') {
+    alert('⚠️ Lakukan analisis terlebih dahulu sebelum mengunduh hasil.');
+    return;
+  }
+
+  const btn = document.querySelector('.cta-download');
+  const oriText = btn.querySelector('.cta-btn-title').textContent;
+  btn.querySelector('.cta-btn-title').textContent = 'Menyiapkan gambar...';
+  btn.style.opacity = '0.7';
+  btn.disabled = true;
+
+  try {
+    // Sembunyikan tombol CTA agar tidak ikut terunduh
+    const ctaSection = document.getElementById('ctaSection');
+    ctaSection.style.display = 'none';
+
+    const canvas = await html2canvas(hasil, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#FEF8F0',
+      scrollY: -window.scrollY
+    });
+
+    ctaSection.style.display = 'block';
+
+    // Tambahkan padding & header branding pada gambar
+    const padded = document.createElement('canvas');
+    const pw = canvas.width + 40;
+    const ph = canvas.height + 100;
+    padded.width  = pw;
+    padded.height = ph;
+    const ctx = padded.getContext('2d');
+
+    // Background
+    ctx.fillStyle = '#FEF8F0';
+    ctx.fillRect(0, 0, pw, ph);
+
+    // Header branding
+    ctx.fillStyle = '#FF353F';
+    ctx.fillRect(0, 0, pw, 70);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 28px Nunito, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('🐝 HDI Kids · Hasil Skrining Tumbuh Kembang', pw / 2, 44);
+
+    // Gambar hasil
+    ctx.drawImage(canvas, 20, 80);
+
+    // Footer branding
+    ctx.fillStyle = '#F0DFCF';
+    ctx.fillRect(0, ph - 30, pw, 30);
+    ctx.fillStyle = '#5A5758';
+    ctx.font = '18px Nunito Sans, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('hdi.com  ·  Standar WHO · Permenkes RI No. 2/2020', pw / 2, ph - 10);
+
+    // Download
+    const nama = document.getElementById('nama').value.trim() || 'anak';
+    const link = document.createElement('a');
+    link.download = `skrining_tumbuh_kembang_${nama.replace(/\s+/g,'_')}.jpg`;
+    link.href = padded.toDataURL('image/jpeg', 0.92);
+    link.click();
+  } catch(err) {
+    alert('Gagal mengunduh gambar. Silakan coba lagi.');
+    console.error(err);
+    document.getElementById('ctaSection').style.display = 'block';
+  }
+
+  btn.querySelector('.cta-btn-title').textContent = oriText;
+  btn.style.opacity = '1';
+  btn.disabled = false;
+}
+
+async function kirimKeSheet(payload) {
+  if (!SCRIPT_URL || SCRIPT_URL === 'PASTE_URL_WEB_APP_DI_SINI') return;
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  } catch(err) {
+    console.warn('Gagal kirim ke Sheets:', err.message);
+  }
+}
+
+/* ── DATA WHO (median, berlaku untuk laki-laki & perempuan, sumber: WHO Child Growth Standards) ── */
+const WHO = {
+  "Laki-laki":  [{u:0,tb:50.0,bb:3.3,imt:13.2},{u:3,tb:61.4,bb:6.0,imt:15.9},{u:6,tb:67.6,bb:7.9,imt:17.3},{u:9,tb:72.3,bb:9.2,imt:17.6},{u:12,tb:75.7,bb:9.6,imt:16.7},{u:18,tb:82.3,bb:10.9,imt:16.1},{u:24,tb:87.1,bb:12.2,imt:16.0},{u:30,tb:91.4,bb:13.3,imt:15.9},{u:36,tb:96.1,bb:14.3,imt:15.5},{u:42,tb:99.9,bb:15.3,imt:15.3},{u:48,tb:103.3,bb:16.3,imt:15.3},{u:54,tb:107.0,bb:17.3,imt:15.1},{u:60,tb:110.0,bb:18.3,imt:15.2},{u:72,tb:116.0,bb:20.5,imt:15.2},{u:84,tb:121.7,bb:22.9,imt:15.5},{u:96,tb:127.0,bb:25.4,imt:15.7},{u:108,tb:132.6,bb:28.6,imt:16.2},{u:120,tb:137.5,bb:31.9,imt:16.8}],
+  "Perempuan":  [{u:0,tb:49.1,bb:3.2,imt:13.3},{u:3,tb:59.8,bb:5.7,imt:15.9},{u:6,tb:65.7,bb:7.3,imt:16.9},{u:9,tb:70.1,bb:8.6,imt:17.4},{u:12,tb:74.0,bb:9.0,imt:16.4},{u:18,tb:80.7,bb:10.2,imt:15.7},{u:24,tb:85.7,bb:11.5,imt:15.7},{u:30,tb:90.0,bb:12.7,imt:15.7},{u:36,tb:94.1,bb:13.9,imt:15.7},{u:42,tb:97.7,bb:14.8,imt:15.5},{u:48,tb:101.5,bb:15.8,imt:15.4},{u:54,tb:104.9,bb:16.8,imt:15.3},{u:60,tb:109.4,bb:17.9,imt:15.0},{u:72,tb:115.1,bb:20.2,imt:15.3},{u:84,tb:121.1,bb:22.9,imt:15.6},{u:96,tb:126.9,bb:26.0,imt:16.1},{u:108,tb:132.5,bb:29.7,imt:16.9},{u:120,tb:138.0,bb:33.7,imt:17.7}]
+};
+
+/* SD berdasarkan rentang WHO publikasi */
+const SD = {
+  bbu:{ normal:1.3, severe:1.3 },
+  tbu:{ normal:5.5, severe:5.5 },
+  imt:{ normal:1.6, severe:1.6 },
+  bbtb:{ normal:1.0, severe:1.0 }
+};
+
+function interp(arr, usia, key) {
+  let lo = arr[0], hi = arr[arr.length-1];
+  for (let i=0;i<arr.length-1;i++) {
+    if (usia >= arr[i].u && usia <= arr[i+1].u) { lo=arr[i]; hi=arr[i+1]; break; }
+  }
+  if (lo.u === hi.u) return lo[key];
+  return lo[key] + (usia-lo.u)/(hi.u-lo.u)*(hi[key]-lo[key]);
+}
+
+function zsc(x,m,sd){ return (x-m)/sd; }
+
+function classifyBBU(z){
+  if(z<-3) return {label:'Sangat kurang',badge:'danger',icon:'😟'};
+  if(z<-2) return {label:'Kurang',badge:'warning',icon:'😐'};
+  if(z<=1)  return {label:'Normal',badge:'normal',icon:'😊'};
+  return {label:'Risiko lebih',badge:'warning',icon:'⚠️'};
+}
+function classifyTBU(z){
+  if(z<-3) return {label:'Sangat pendek',badge:'danger',icon:'😟'};
+  if(z<-2) return {label:'Pendek (stunting)',badge:'warning',icon:'😐'};
+  if(z<=2)  return {label:'Normal',badge:'normal',icon:'😊'};
+  return {label:'Tinggi',badge:'info',icon:'🌟'};
+}
+function classifyIMT(z){
+  if(z<-3) return {label:'Gizi buruk',badge:'danger',icon:'🚨'};
+  if(z<-2) return {label:'Gizi kurang',badge:'warning',icon:'😐'};
+  if(z<=1)  return {label:'Normal',badge:'normal',icon:'😊'};
+  if(z<=2)  return {label:'Risiko gizi lebih',badge:'warning',icon:'⚠️'};
+  return {label:'Overweight / Obesitas',badge:'danger',icon:'😟'};
+}
+function classifyBBTB(z){
+  if(z<-3) return {label:'Severe wasting',badge:'danger',icon:'🚨'};
+  if(z<-2) return {label:'Wasting',badge:'warning',icon:'😐'};
+  if(z<=1)  return {label:'Normal',badge:'normal',icon:'😊'};
+  if(z<=2)  return {label:'Risiko gizi lebih',badge:'warning',icon:'⚠️'};
+  return {label:'Gizi lebih / Obesitas',badge:'danger',icon:'😟'};
+}
+
+/* ── PRODUK HDI per kondisi ── */
+const PRODUK_HDI = {
+  gizi_kurang: [
+    { emoji:'🍯', name:'HDI Kids™ HoneyBee PollenS', tag:'Nutrisi & Tumbuh Kembang', desc:'Bee pollen tablet kunyah rasa madu-vanila. Membantu melengkapi asupan nutrisi tumbuh kembang anak, meningkatkan konsentrasi, dan stamina.', chips:['Nutrisi lengkap','Energi alami','Konsentrasi'], highlight:true },
+    { emoji:'🧸', name:'HDI KIDS Q Bees', tag:'Tulang & Otak', desc:'Mengandung bee pollen, ekstrak bacopa monnieri, dan alga merah (70 mineral termasuk kalsium & magnesium). Mendukung pertumbuhan tulang, perkembangan otak, dan imunitas.', chips:['Pertumbuhan tulang','Perkembangan otak','Imunitas'], highlight:false },
+    { emoji:'🍬', name:'HDI KIDS Gummy Bees', tag:'Imunitas Harian', desc:'Gummy vitamin C rasa stroberi-anggur dengan propolis, madu, dan ekstrak goji berry. Tanpa gelatin, dengan pewarna & perisa alami. Disukai anak-anak!', chips:['Vitamin C','Propolis','Rasa enak'], highlight:false }
+  ],
+  stunting: [
+    { emoji:'🧸', name:'HDI KIDS Q Bees', tag:'Tulang Kuat', desc:'Diformulasikan khusus dengan ekstrak alga merah (70 mineral termasuk kalsium & magnesium) untuk mendukung kesehatan dan pertumbuhan tulang si kecil. Juga mengandung bacopa monnieri untuk perkembangan otak.', chips:['Kalsium alami','Pertumbuhan tulang','Mineral lengkap'], highlight:true },
+    { emoji:'🍯', name:'HDI Kids™ HoneyBee PollenS', tag:'Nutrisi Tumbuh Kembang', desc:'Bee pollen kaya asam amino dan vitamin, diformulasikan untuk mengoptimalkan tumbuh kembang anak. Disajikan dalam tablet kunyah rasa vanila-madu.', chips:['Protein alami','Vitamin','Tumbuh kembang'], highlight:false },
+    { emoji:'🍯', name:'HDI Naturals™ Clover Honey', tag:'Energi & Pencernaan', desc:'Madu murni berindeks glikemik rendah (53). Membantu penyerapan nutrisi, menjaga kesehatan pencernaan, dan sebagai sumber energi alami untuk si kecil.', chips:['Penyerapan nutrisi','Pencernaan sehat','Energi alami'], highlight:false }
+  ],
+  obesitas: [
+    { emoji:'🍯', name:'HDI Naturals™ Clover Honey', tag:'Pengganti Gula Sehat', desc:'Madu murni berindeks glikemik rendah (53) — aman sebagai pengganti gula sehari-hari. Membantu pencernaan dan penyerapan nutrisi yang lebih baik tanpa lonjakan gula darah.', chips:['GI rendah','Pencernaan sehat','Energi stabil'], highlight:true },
+    { emoji:'🍬', name:'HDI KIDS Gummy Bees', tag:'Imunitas Harian', desc:'Vitamin C harian dalam bentuk gummy alami. Mendukung imunitas sambil menggantikan camilan manis yang kurang sehat dengan pilihan yang lebih bergizi.', chips:['Vitamin C','Alami','Tanpa gelatin'], highlight:false }
+  ],
+  normal: [
+    { emoji:'🍬', name:'HDI KIDS Gummy Bees', tag:'Imunitas Harian', desc:'Vitamin C harian dalam bentuk gummy yang enak! Propolis + madu + ekstrak buah alami untuk menjaga si kecil tetap sehat dan berenergi setiap hari.', chips:['Vitamin C','Imunitas','Menyenangkan'], highlight:true },
+    { emoji:'🍯', name:'HDI Kids™ HoneyBee PollenS', tag:'Optimalkan Tumbuh Kembang', desc:'Meski tumbuh kembang sudah baik, bee pollen membantu memaksimalkan konsentrasi, stamina, dan kecukupan nutrisi untuk si kecil yang aktif.', chips:['Konsentrasi','Stamina','Nutrisi optimal'], highlight:false },
+    { emoji:'🧸', name:'HDI KIDS Q Bees', tag:'Tulang & Kognitif', desc:'Suplemen harian untuk mendukung kesehatan tulang dengan kalsium alga merah dan mengoptimalkan perkembangan otak dengan ekstrak bacopa monnieri.', chips:['Tulang kuat','Otak optimal','Imunitas'], highlight:false }
+  ]
+};
+
+function getProdukHDI(zBBU, zTBU, zIMT, zBBTB) {
+  if (zIMT > 2 || zBBTB > 2) return { kondisi: 'Berat badan berlebih / obesitas', produk: PRODUK_HDI.obesitas };
+  if (zBBU < -2 || zTBU < -2 || zIMT < -2) {
+    if (zTBU < -2) return { kondisi: 'Stunting / tinggi badan kurang', produk: PRODUK_HDI.stunting };
+    return { kondisi: 'Gizi kurang / berat badan rendah', produk: PRODUK_HDI.gizi_kurang };
+  }
+  return { kondisi: 'Tumbuh kembang normal — optimalisasi', produk: PRODUK_HDI.normal };
+}
+
+function produkCardHtml(p) {
+  const chips = p.chips.map(c => `<span class="manfaat-chip">${c}</span>`).join('');
+  return `
+    <div class="produk-card${p.highlight?' highlight':''}">
+      <div class="produk-emoji">${p.emoji}</div>
+      <div class="produk-info">
+        <div class="produk-name">${p.name}</div>
+        <span class="produk-tag">${p.tag}</span>
+        <div class="produk-desc">${p.desc}</div>
+        <div class="produk-manfaat">${chips}</div>
+      </div>
+    </div>`;
+}
+
+function badge(item) {
+  return `<span class="badge ${item.badge}">${item.icon} ${item.label}</span>`;
+}
+
+async function analyze() {
+  const nama  = document.getElementById('nama').value.trim() || 'Anak';
+  const jk    = document.getElementById('jk').value;
+  const usia  = parseFloat(document.getElementById('usia').value);
+  const bb    = parseFloat(document.getElementById('bb').value);
+  const tb    = parseFloat(document.getElementById('tb').value);
+
+  if (!jk || isNaN(usia) || isNaN(bb) || isNaN(tb)) {
+    alert('⚠️ Mohon lengkapi semua data: jenis kelamin, usia, berat badan, dan tinggi badan.');
+    return;
+  }
+
+  const btn = document.getElementById('btnAnalyze');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Menganalisis...';
+
+  const ref  = WHO[jk];
+  const tbM  = interp(ref, usia, 'tb');
+  const bbM  = interp(ref, usia, 'bb');
+  const imtM = interp(ref, usia, 'imt');
+  const imt  = bb / (tb/100)**2;
+
+  const sdBBU  = SD.bbu.normal, sdTBU = SD.tbu.normal;
+  const sdIMT  = SD.imt.normal, sdBBTB = SD.bbtb.normal;
+
+  const zBBU  = zsc(bb,  bbM,  sdBBU);
+  const zTBU  = zsc(tb,  tbM,  sdTBU);
+  const zIMT  = zsc(imt, imtM, sdIMT);
+  const zBBTB = zsc(bb,  bbM,  sdBBTB);
+
+  const stBBU  = classifyBBU(zBBU);
+  const stTBU  = classifyTBU(zTBU);
+  const stIMT  = classifyIMT(zIMT);
+  const stBBTB = classifyBBTB(zBBTB);
+
+  const usiaLabel = usia < 24
+    ? `${usia} bulan`
+    : `${Math.floor(usia/12)} tahun${usia%12 ? ' '+usia%12+' bulan' : ''}`;
+
+  /* Metric tiles */
+  document.getElementById('metricGrid').innerHTML = `
+    <div class="metric-tile"><div class="mlabel">Usia</div><div class="mval">${usiaLabel}</div><div class="msub">${jk}</div></div>
+    <div class="metric-tile"><div class="mlabel">Berat badan</div><div class="mval">${bb.toFixed(1)} kg</div><div class="msub">Median WHO: ${bbM.toFixed(1)} kg</div></div>
+    <div class="metric-tile"><div class="mlabel">Tinggi badan</div><div class="mval">${tb.toFixed(1)} cm</div><div class="msub">Median WHO: ${tbM.toFixed(1)} cm</div></div>
+    <div class="metric-tile"><div class="mlabel">IMT</div><div class="mval">${imt.toFixed(1)}</div><div class="msub">Median WHO: ${imtM.toFixed(1)}</div></div>
+  `;
+
+  /* Status rows */
+  document.getElementById('statusRows').innerHTML = `
+    <div class="status-item"><div><div class="sname">BB/U · Berat badan menurut usia</div><div class="sscore">Z-score: ${zBBU.toFixed(2)}</div></div>${badge(stBBU)}</div>
+    <div class="status-item"><div><div class="sname">TB/U · Tinggi badan menurut usia</div><div class="sscore">Z-score: ${zTBU.toFixed(2)}</div></div>${badge(stTBU)}</div>
+    <div class="status-item"><div><div class="sname">IMT/U · Indeks massa tubuh menurut usia</div><div class="sscore">Z-score: ${zIMT.toFixed(2)}</div></div>${badge(stIMT)}</div>
+    <div class="status-item"><div><div class="sname">BB/TB · Berat badan menurut tinggi</div><div class="sscore">Z-score: ${zBBTB.toFixed(2)}</div></div>${badge(stBBTB)}</div>
+  `;
+
+  /* Rujukan */
+  const perluRujukan = zBBU<-3 || zTBU<-3 || zIMT<-3 || zIMT>2 || zBBTB<-3;
+  const rAlert = document.getElementById('rujukanAlert');
+  if (perluRujukan) {
+    rAlert.className = 'rujukan-alert visible';
+    document.getElementById('rujukanText').textContent =
+      'Ditemukan indikator di luar batas normal (Z-score < -3 atau IMT > +2 SD). Segera konsultasikan ke dokter atau ahli gizi untuk evaluasi lebih lanjut.';
+  } else {
+    rAlert.className = 'rujukan-alert';
+  }
+
+  /* Show result section */
+  const rs = document.getElementById('resultSection');
+  rs.style.display = 'block'; rs.className = 'visible';
+  document.getElementById('kesimpulan').style.display = 'none';
+  document.getElementById('kesimpulanLoading').style.display = 'flex';
+  document.getElementById('rekoList').style.display = 'none';
+  document.getElementById('rekoLoading').style.display = 'flex';
+  document.getElementById('produkCard').style.display = 'none';
+
+  setTimeout(() => rs.scrollIntoView({ behavior:'smooth', block:'start' }), 100);
+
+  /* Produk HDI — tampilkan langsung tanpa tunggu AI */
+  const produkInfo = getProdukHDI(zBBU, zTBU, zIMT, zBBTB);
+  const produkHtml = produkInfo.produk.map(p => produkCardHtml(p)).join('');
+  document.getElementById('produkGrid').innerHTML = `
+    <div style="font-size:12px;color:var(--text-mid);margin-bottom:10px;padding:8px 12px;background:var(--soft-bee);border-radius:var(--radius-sm);font-weight:700;">
+      🎯 Kondisi terdeteksi: <strong>${produkInfo.kondisi}</strong>
+    </div>
+    ${produkHtml}
+  `;
+  document.getElementById('produkCard').style.display = 'block';
+
+  /* AI call */
+  const prompt = `Kamu adalah AI Health Assistant yang hangat dan ramah. Buat analisis tumbuh kembang berdasarkan data berikut (GUNAKAN standar WHO sesuai Permenkes RI No. 2 Tahun 2020):
+
+Nama: ${nama} | Usia: ${usiaLabel} | Jenis kelamin: ${jk}
+Berat badan: ${bb} kg (median WHO: ${bbM.toFixed(1)} kg)
+Tinggi badan: ${tb} cm (median WHO: ${tbM.toFixed(1)} cm)
+IMT: ${imt.toFixed(1)} (median WHO: ${imtM.toFixed(1)})
+
+Status BB/U: ${stBBU.label} (Z: ${zBBU.toFixed(2)})
+Status TB/U: ${stTBU.label} (Z: ${zTBU.toFixed(2)})
+Status IMT/U: ${stIMT.label} (Z: ${zIMT.toFixed(2)})
+Status BB/TB: ${stBBTB.label} (Z: ${zBBTB.toFixed(2)})
+
+Tulis dalam format persis ini:
+KESIMPULAN:
+[2-3 kalimat singkat, bahasa orang tua, hangat, tidak menakutkan. Sebutkan nama anak.]
+
+REKOMENDASI:
+- [Saran pola makan / nutrisi spesifik sesuai kondisi]
+- [Saran stimulasi tumbuh kembang]
+- [Saran aktivitas atau tidur]
+- [Saran pemantauan lanjut / jadwal kontrol]
+- [Jika ada indikator kurang/lebih: saran konsultasi dan dukungan suplementasi HDI Kids]`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:800, messages:[{role:'user',content:prompt}] })
+    });
+    const data2 = await resp.json();
+    const text  = data2.content?.map(i=>i.text||'').join('')||'';
+
+    const kMatch = text.match(/KESIMPULAN:\s*([\s\S]*?)(?=REKOMENDASI:|$)/i);
+    const rMatch = text.match(/REKOMENDASI:\s*([\s\S]*)$/i);
+
+    const kesimpulanText = kMatch ? kMatch[1].trim() : 'Pemantauan tumbuh kembang sudah dilakukan. Lihat status Z-score di atas untuk detail.';
+
+    document.getElementById('kesimpulanLoading').style.display = 'none';
+    const kEl = document.getElementById('kesimpulan');
+    kEl.style.display = 'block';
+    kEl.textContent = kesimpulanText;
+
+    document.getElementById('rekoLoading').style.display = 'none';
+    const rEl = document.getElementById('rekoList');
+    rEl.style.display = 'flex';
+    if (rMatch) {
+      const poin = rMatch[1].trim().split('\n').map(l=>l.replace(/^[-•*\d.]\s*/,'')).filter(l=>l.trim());
+      const isUrgent = t => /rujuk|konsultasi|segera|dokter|darurat|gizi buruk|severe|HDI|suplemen/i.test(t);
+      rEl.innerHTML = poin.map(p => {
+        const urg = isUrgent(p);
+        return `<li class="reko-item ${urg?'warn':'ok'}"><div class="ricon">${urg?'⚠️':'✅'}</div><span>${p}</span></li>`;
+      }).join('');
+    } else {
+      rEl.innerHTML = '<li class="reko-item ok"><div class="ricon">✅</div><span>Pantau pertumbuhan si kecil setiap bulan di posyandu atau fasilitas kesehatan terdekat.</span></li>';
+    }
+
+    // Kirim data ke Google Sheets
+    await kirimKeSheet({
+      nama, jk, usia, usiaLabel,
+      bb, tb, imt: parseFloat(imt.toFixed(2)),
+      bbMedian: parseFloat(bbM.toFixed(2)),
+      tbMedian: parseFloat(tbM.toFixed(2)),
+      imtMedian: parseFloat(imtM.toFixed(2)),
+      zBBU:  parseFloat(zBBU.toFixed(2)),
+      zTBU:  parseFloat(zTBU.toFixed(2)),
+      zIMT:  parseFloat(zIMT.toFixed(2)),
+      zBBTB: parseFloat(zBBTB.toFixed(2)),
+      statusBBU:  stBBU.label,
+      statusTBU:  stTBU.label,
+      statusIMT:  stIMT.label,
+      statusBBTB: stBBTB.label,
+      perluRujukan,
+      kondisiHDI: produkInfo.kondisi,
+      kesimpulan: kesimpulanText
+    });
+
+  } catch(e) {
+    document.getElementById('kesimpulanLoading').style.display = 'none';
+    const kEl = document.getElementById('kesimpulan');
+    kEl.style.display = 'block';
+    kEl.textContent = 'Tidak dapat memuat analisis AI saat ini. Silakan lihat interpretasi Z-score di atas.';
+    document.getElementById('rekoLoading').style.display = 'none';
+    const rEl = document.getElementById('rekoList');
+    rEl.style.display = 'flex';
+    rEl.innerHTML = '<li class="reko-item ok"><div class="ricon">✅</div><span>Pantau pertumbuhan si kecil setiap bulan di posyandu atau fasilitas kesehatan.</span></li>';
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '🔄 Analisis Ulang';
+}
+</script>
+</body>
+</html>
