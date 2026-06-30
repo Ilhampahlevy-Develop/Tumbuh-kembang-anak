@@ -614,6 +614,40 @@ function badge(item) {
   return `<span class="badge ${item.badge}">${item.icon} ${item.label}</span>`;
 }
 
+/* ── JSONP helper — kirim data ke Apps Script tanpa CORS ── */
+function panggilScriptJSONP(payload) {
+  return new Promise((resolve, reject) => {
+    const cbName = 'cb_' + Date.now();
+    const timeout = setTimeout(() => {
+      delete window[cbName];
+      reject(new Error('Timeout'));
+    }, 30000);
+
+    window[cbName] = function(data) {
+      clearTimeout(timeout);
+      delete window[cbName];
+      const s = document.getElementById('jsonp_' + cbName);
+      if (s) s.remove();
+      resolve(data);
+    };
+
+    const url = SCRIPT_URL
+      + '?callback=' + cbName
+      + '&data=' + encodeURIComponent(JSON.stringify(payload));
+
+    const script = document.createElement('script');
+    script.id  = 'jsonp_' + cbName;
+    script.src = url;
+    script.onerror = () => {
+      clearTimeout(timeout);
+      delete window[cbName];
+      script.remove();
+      reject(new Error('Script load error'));
+    };
+    document.body.appendChild(script);
+  });
+}
+
 async function analyze() {
   const nama  = document.getElementById('nama').value.trim() || 'Anak';
   const jk    = document.getElementById('jk').value;
@@ -702,36 +736,32 @@ async function analyze() {
   `;
   document.getElementById('produkCard').style.display = 'block';
 
-  /* ── Kirim ke Apps Script → AI → Sheets ── */
+  /* ── Kirim ke Apps Script via JSONP (100% bypass CORS) ── */
   document.getElementById('kesimpulanLoading').style.display = 'flex';
   document.getElementById('kesimpulan').style.display = 'none';
   document.getElementById('rekoLoading').style.display = 'flex';
   document.getElementById('rekoList').style.display = 'none';
 
   try {
-    const resp = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        nama, jk, usia, usiaLabel,
-        bb, tb, imt: parseFloat(imt.toFixed(2)),
-        bbMedian: parseFloat(bbM.toFixed(2)),
-        tbMedian: parseFloat(tbM.toFixed(2)),
-        imtMedian: parseFloat(imtM.toFixed(2)),
-        zBBU:  parseFloat(zBBU.toFixed(2)),
-        zTBU:  parseFloat(zTBU.toFixed(2)),
-        zIMT:  parseFloat(zIMT.toFixed(2)),
-        zBBTB: parseFloat(zBBTB.toFixed(2)),
-        statusBBU:  stBBU.label,
-        statusTBU:  stTBU.label,
-        statusIMT:  stIMT.label,
-        statusBBTB: stBBTB.label,
-        perluRujukan,
-        kondisiHDI: produkInfo.kondisi
-      })
-    });
+    const payload = {
+      nama, jk, usia, usiaLabel,
+      bb, tb, imt: parseFloat(imt.toFixed(2)),
+      bbMedian: parseFloat(bbM.toFixed(2)),
+      tbMedian: parseFloat(tbM.toFixed(2)),
+      imtMedian: parseFloat(imtM.toFixed(2)),
+      zBBU:  parseFloat(zBBU.toFixed(2)),
+      zTBU:  parseFloat(zTBU.toFixed(2)),
+      zIMT:  parseFloat(zIMT.toFixed(2)),
+      zBBTB: parseFloat(zBBTB.toFixed(2)),
+      statusBBU:  stBBU.label,
+      statusTBU:  stTBU.label,
+      statusIMT:  stIMT.label,
+      statusBBTB: stBBTB.label,
+      perluRujukan,
+      kondisiHDI: produkInfo.kondisi
+    };
 
-    const result = await resp.json();
+    const result = await panggilScriptJSONP(payload);
 
     document.getElementById('kesimpulanLoading').style.display = 'none';
     const kEl = document.getElementById('kesimpulan');
