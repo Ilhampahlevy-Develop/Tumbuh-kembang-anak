@@ -225,6 +225,23 @@ select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='htt
           </div>
         </div>
       </div>
+      <div class="row-2" style="margin-top:13px">
+        <div class="field">
+          <label for="namaOrtu">Nama orang tua <span style="color:var(--red-heart)">*</span></label>
+          <div class="input-wrap">
+            <span class="input-icon">👨‍👩‍👧</span>
+            <input type="text" id="namaOrtu" placeholder="Contoh: Ibu Sari" required />
+          </div>
+        </div>
+        <div class="field">
+          <label for="noHp">No. WhatsApp orang tua <span style="color:var(--red-heart)">*</span></label>
+          <div class="input-wrap">
+            <span class="input-icon">📱</span>
+            <input type="tel" id="noHp" placeholder="Contoh: 08123456789" required />
+          </div>
+          <div class="hint">Wajib diisi · format: 08xx atau +628xx</div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -649,12 +666,18 @@ function panggilScriptJSONP(payload) {
 }
 
 async function analyze() {
-  const nama  = document.getElementById('nama').value.trim() || 'Anak';
-  const jk    = document.getElementById('jk').value;
-  const usia  = parseFloat(document.getElementById('usia').value);
-  const bb    = parseFloat(document.getElementById('bb').value);
-  const tb    = parseFloat(document.getElementById('tb').value);
+  const nama     = document.getElementById('nama').value.trim() || 'Anak';
+  const namaOrtu = document.getElementById('namaOrtu').value.trim();
+  const noHp     = document.getElementById('noHp').value.trim();
+  const jk       = document.getElementById('jk').value;
+  const usia     = parseFloat(document.getElementById('usia').value);
+  const bb       = parseFloat(document.getElementById('bb').value);
+  const tb       = parseFloat(document.getElementById('tb').value);
 
+  if (!namaOrtu || !noHp) {
+    alert('⚠️ Nama orang tua dan nomor WhatsApp wajib diisi.');
+    return;
+  }
   if (!jk || isNaN(usia) || isNaN(bb) || isNaN(tb)) {
     alert('⚠️ Mohon lengkapi semua data: jenis kelamin, usia, berat badan, dan tinggi badan.');
     return;
@@ -736,68 +759,115 @@ async function analyze() {
   `;
   document.getElementById('produkCard').style.display = 'block';
 
-  /* ── Kirim ke Apps Script via JSONP (100% bypass CORS) ── */
-  document.getElementById('kesimpulanLoading').style.display = 'flex';
-  document.getElementById('kesimpulan').style.display = 'none';
-  document.getElementById('rekoLoading').style.display = 'flex';
-  document.getElementById('rekoList').style.display = 'none';
+  /* ── Kesimpulan & Rekomendasi dari logika Z-score (lokal, instan) ── */
+  const kesimpulanText = buatKesimpulan(nama, usiaLabel, zBBU, zTBU, zIMT, zBBTB);
+  const rekoArr        = buatRekomendasi(zBBU, zTBU, zIMT, zBBTB);
 
-  try {
-    const payload = {
-      nama, jk, usia, usiaLabel,
-      bb, tb, imt: parseFloat(imt.toFixed(2)),
-      bbMedian: parseFloat(bbM.toFixed(2)),
-      tbMedian: parseFloat(tbM.toFixed(2)),
-      imtMedian: parseFloat(imtM.toFixed(2)),
-      zBBU:  parseFloat(zBBU.toFixed(2)),
-      zTBU:  parseFloat(zTBU.toFixed(2)),
-      zIMT:  parseFloat(zIMT.toFixed(2)),
-      zBBTB: parseFloat(zBBTB.toFixed(2)),
-      statusBBU:  stBBU.label,
-      statusTBU:  stTBU.label,
-      statusIMT:  stIMT.label,
-      statusBBTB: stBBTB.label,
-      perluRujukan,
-      kondisiHDI: produkInfo.kondisi
-    };
+  document.getElementById('kesimpulanLoading').style.display = 'none';
+  const kEl = document.getElementById('kesimpulan');
+  kEl.style.display = 'block';
+  kEl.textContent = kesimpulanText;
 
-    const result = await panggilScriptJSONP(payload);
+  document.getElementById('rekoLoading').style.display = 'none';
+  const rEl = document.getElementById('rekoList');
+  rEl.style.display = 'flex';
+  const isUrgent = t => /rujuk|konsultasi|segera|dokter|ahli gizi|HDI/i.test(t);
+  rEl.innerHTML = rekoArr.map(p => {
+    const urg = isUrgent(p);
+    return `<li class="reko-item ${urg?'warn':'ok'}"><div class="ricon">${urg?'⚠️':'✅'}</div><span>${p}</span></li>`;
+  }).join('');
 
-    document.getElementById('kesimpulanLoading').style.display = 'none';
-    const kEl = document.getElementById('kesimpulan');
-    kEl.style.display = 'block';
-    kEl.textContent = result.kesimpulan || 'Analisis selesai. Lihat status Z-score di atas.';
-
-    document.getElementById('rekoLoading').style.display = 'none';
-    const rEl = document.getElementById('rekoList');
-    rEl.style.display = 'flex';
-    const rekoArr = Array.isArray(result.rekomendasi) ? result.rekomendasi : [];
-    if (rekoArr.length > 0) {
-      const isUrgent = t => /rujuk|konsultasi|segera|dokter|ahli gizi|HDI/i.test(t);
-      rEl.innerHTML = rekoArr.map(p => {
-        const urg = isUrgent(p);
-        return `<li class="reko-item ${urg?'warn':'ok'}"><div class="ricon">${urg?'⚠️':'✅'}</div><span>${p}</span></li>`;
-      }).join('');
-    } else {
-      rEl.innerHTML = '<li class="reko-item ok"><div class="ricon">✅</div><span>Pantau pertumbuhan si kecil setiap bulan di posyandu atau fasilitas kesehatan terdekat.</span></li>';
-    }
-
-  } catch(err) {
-    console.warn('Error:', err.message);
-    document.getElementById('kesimpulanLoading').style.display = 'none';
-    document.getElementById('kesimpulan').style.display = 'block';
-    document.getElementById('kesimpulan').textContent = 'Tidak dapat memuat analisis saat ini. Silakan lihat interpretasi Z-score di atas.';
-    document.getElementById('rekoLoading').style.display = 'none';
-    document.getElementById('rekoList').style.display = 'flex';
-    document.getElementById('rekoList').innerHTML = '<li class="reko-item ok"><div class="ricon">✅</div><span>Pantau pertumbuhan si kecil setiap bulan di posyandu atau fasilitas kesehatan.</span></li>';
-  }
+  /* ── Kirim data leads ke Sheets via JSONP (fire & forget) ── */
+  const payload = {
+    nama, namaOrtu, noHp, jk, usia, usiaLabel,
+    bb, tb, imt: parseFloat(imt.toFixed(2)),
+    bbMedian: parseFloat(bbM.toFixed(2)),
+    tbMedian: parseFloat(tbM.toFixed(2)),
+    imtMedian: parseFloat(imtM.toFixed(2)),
+    zBBU:  parseFloat(zBBU.toFixed(2)),
+    zTBU:  parseFloat(zTBU.toFixed(2)),
+    zIMT:  parseFloat(zIMT.toFixed(2)),
+    zBBTB: parseFloat(zBBTB.toFixed(2)),
+    statusBBU:  stBBU.label,
+    statusTBU:  stTBU.label,
+    statusIMT:  stIMT.label,
+    statusBBTB: stBBTB.label,
+    perluRujukan,
+    kondisiHDI:  produkInfo.kondisi,
+    kesimpulan:  kesimpulanText,
+    rekomendasi: rekoArr
+  };
+  kirimKeSheets(payload);
 
   btn.disabled = false;
   btn.innerHTML = '🔄 Analisis Ulang';
 }
 
-// fungsi-fungsi berikut tidak lagi dipakai tapi dibiarkan agar tidak error
-function buatKesimpulan(){} function buatRekomendasi(){}
+/* ── Kirim ke Sheets via JSONP (tidak tunggu hasil) ── */
+function kirimKeSheets(payload) {
+  const cbName = 'cb_' + Date.now();
+  window[cbName] = function(){ delete window[cbName]; const s=document.getElementById('s_'+cbName); if(s)s.remove(); };
+  const url = SCRIPT_URL + '?callback=' + cbName + '&data=' + encodeURIComponent(JSON.stringify(payload));
+  const script = document.createElement('script');
+  script.id = 's_' + cbName;
+  script.src = url;
+  script.onerror = function(){ delete window[cbName]; script.remove(); };
+  document.body.appendChild(script);
+}
+
+/* ── Kesimpulan berbasis Z-score ── */
+function buatKesimpulan(nama, usiaLabel, zBBU, zTBU, zIMT, zBBTB) {
+  if (zIMT > 2 || zBBTB > 2)
+    return `Hasil pemantauan menunjukkan berat badan ${nama} melebihi standar WHO untuk usia ${usiaLabel}. Kondisi ini perlu diperhatikan agar tidak berkembang menjadi obesitas. Dengan pengaturan pola makan dan aktivitas fisik yang tepat, berat badan si kecil bisa kembali ideal.`;
+  if (zIMT < -3 || zBBTB < -3 || zBBU < -3)
+    return `Perlu perhatian segera! Berat badan ${nama} berada jauh di bawah standar WHO untuk usia ${usiaLabel}. Kondisi ini memerlukan evaluasi dan penanganan dari tenaga kesehatan sesegera mungkin. Jangan khawatir, dengan penanganan yang tepat kondisi ini dapat diperbaiki.`;
+  if (zTBU < -3)
+    return `Tinggi badan ${nama} berada sangat di bawah standar WHO untuk usia ${usiaLabel}. Kondisi ini perlu mendapat perhatian serius dari dokter atau ahli gizi. Asupan nutrisi yang tepat dan konsisten sangat penting untuk mendukung pemulihan pertumbuhan si kecil.`;
+  if (zTBU < -2)
+    return `Tinggi badan ${nama} berada di bawah standar WHO untuk usia ${usiaLabel} (stunting). Kondisi ini umumnya berkaitan dengan kurangnya asupan nutrisi dalam jangka panjang. Dengan perbaikan pola makan dan stimulasi yang tepat, tumbuh kembang si kecil bisa dioptimalkan.`;
+  if (zBBU < -2 || zIMT < -2)
+    return `Berat badan ${nama} sedikit di bawah standar WHO untuk usia ${usiaLabel}. Ini adalah sinyal untuk meningkatkan asupan nutrisi si kecil. Jangan khawatir, dengan pola makan yang lebih baik dan pemantauan rutin, kondisi ini dapat diperbaiki dengan cepat.`;
+  return `Kabar baik! Pertumbuhan ${nama} berada dalam kondisi normal sesuai standar WHO untuk usia ${usiaLabel}. Berat badan, tinggi badan, dan indeks massa tubuh semuanya terpantau baik. Pertahankan pola makan bergizi dan terus stimulasi tumbuh kembang si kecil ya! 🌟`;
+}
+
+/* ── Rekomendasi berbasis Z-score ── */
+function buatRekomendasi(zBBU, zTBU, zIMT, zBBTB) {
+  if (zIMT > 2 || zBBTB > 2) return [
+    'Batasi makanan tinggi gula, gorengan, dan minuman manis seperti susu kental manis atau minuman kemasan.',
+    'Perbanyak sayur, buah, dan makanan berserat tinggi sebagai camilan sehat pengganti jajanan.',
+    'Tingkatkan aktivitas fisik minimal 60 menit per hari — bermain di luar, bersepeda, atau berenang.',
+    'Batasi screen time maksimal 1–2 jam per hari agar anak lebih aktif bergerak.',
+    'Konsultasikan ke dokter atau ahli gizi. Pertimbangkan HDI Naturals™ Clover Honey sebagai pengganti gula sehat (GI rendah 53) dan HDI KIDS Gummy Bees untuk imunitas harian.',
+  ];
+  if (zIMT < -3 || zBBTB < -3 || zBBU < -3) return [
+    'Segera konsultasikan ke dokter atau ahli gizi — kondisi ini memerlukan penanganan medis segera.',
+    'Berikan makanan tinggi energi dan protein setiap 2–3 jam: telur, daging, ikan, tahu, tempe, kacang-kacangan.',
+    'Tambahkan sumber lemak sehat seperti alpukat, minyak kelapa, atau mentega pada makanan utama.',
+    'Pantau berat badan setiap minggu dan catat perkembangannya untuk dilaporkan ke tenaga kesehatan.',
+    'Pertimbangkan HDI Kids™ HoneyBee PollenS untuk melengkapi nutrisi harian dan HDI KIDS Q Bees untuk mendukung pemulihan imunitas, tulang, dan perkembangan otak anak.',
+  ];
+  if (zTBU < -2) return [
+    'Tingkatkan asupan protein hewani setiap hari: telur, ikan, ayam, daging — minimal 1 porsi setiap makan.',
+    'Pastikan kecukupan kalsium dari susu, keju, tempe, atau kacang hijau untuk mendukung pertumbuhan tulang.',
+    'Berikan makanan beragam dengan porsi sesuai usia, hindari makanan instan atau ultra-proses.',
+    'Stimulasi aktif setiap hari: bermain, membaca, bernyanyi, dan eksplorasi lingkungan.',
+    'Konsultasikan ke dokter atau ahli gizi. Pertimbangkan HDI KIDS Q Bees (kalsium alga merah 70 mineral) untuk pertumbuhan tulang optimal dan HDI Kids™ HoneyBee PollenS untuk nafsu makan dan stamina.',
+  ];
+  if (zBBU < -2 || zIMT < -2) return [
+    'Tambah frekuensi makan menjadi 3x makan utama dan 2–3x camilan bergizi setiap hari.',
+    'Perbanyak protein hewani: telur, ikan, ayam, atau daging minimal sekali sehari.',
+    'Fortifikasi makanan dengan tambahan minyak, mentega, atau santan untuk meningkatkan kalori.',
+    'Pantau berat badan setiap 2 minggu dan lakukan pemeriksaan ke Posyandu atau Puskesmas rutin.',
+    'Pertimbangkan HDI Kids™ HoneyBee PollenS untuk melengkapi nutrisi dan meningkatkan stamina, serta HDI KIDS Q Bees untuk mendukung kesehatan menyeluruh dan perkembangan otak anak.',
+  ];
+  return [
+    'Pertahankan pola makan gizi seimbang dengan variasi makanan dari semua kelompok: karbohidrat, protein, lemak, sayur, dan buah.',
+    'Berikan protein hewani (telur, ikan, ayam) minimal sekali sehari untuk mendukung pertumbuhan optimal.',
+    'Dukung aktivitas fisik setiap hari minimal 60 menit dan pastikan tidur cukup sesuai usia anak.',
+    'Lakukan stimulasi tumbuh kembang sesuai usia — bermain, membaca, dan bersosialisasi dengan teman sebaya.',
+    'Pantau pertumbuhan rutin setiap bulan di Posyandu. Pertimbangkan HDI KIDS Q Bees untuk mengoptimalkan tulang, otak, imunitas, dan energi, serta HDI KIDS Gummy Bees sebagai vitamin C harian yang menyenangkan.',
+  ];
+}
 </script>
 </body>
 </html>
